@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:orientation="vertical"
+  android:padding="20dp"
+  android:gravity="center_horizontal">
+
+  <TextView
+    android:id="@+id/txtStatus"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="Status: idle"
+    android:textSize="16sp"
+    android:paddingBottom="16dp"/>
+
+  <Button
+    android:id="@+id/btnStart"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="@string/start" />
+
+  <Button
+    android:id="@+id/btnStop"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="10dp"
+    android:text="@string/stop" />
+
+  <Button
+    android:id="@+id/btnPlayLatest"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="10dp"
+    android:text="@string/play_latest" />
+
+  <Button
+    android:id="@+id/btnLibrary"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="10dp"
+    android:text="@string/library" />
+
+  <TextView
+    android:id="@+id/txtHint"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="18dp"
+    android:text="כדי שההקלטה תיעצר כשאין שימוש, חייב להפעיל Settings > Accessibility > VIPORecorder Idle Service."
+    android:textSize="13sp" />
+
+</LinearLayout>

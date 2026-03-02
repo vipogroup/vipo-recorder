@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:orientation="vertical"
+  android:padding="16dp">
+
+  <TextView
+    android:id="@+id/txtTitle"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="@string/library"
+    android:textSize="18sp"
+    android:textStyle="bold"
+    android:paddingBottom="10dp" />
+
+  <TextView
+    android:id="@+id/txtFilterApp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="@string/filter_by_app"
+    android:textSize="14sp" />
+
+  <Spinner
+    android:id="@+id/spnPackage"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="6dp" />
+
+  <TextView
+    android:id="@+id/txtFilterRange"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="12dp"
+    android:text="@string/filter_by_time"
+    android:textSize="14sp" />
+
+  <RadioGroup
+    android:id="@+id/radioRange"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="6dp"
+    android:orientation="horizontal">
+
+    <RadioButton
+      android:id="@+id/rangeDay"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/range_day" />
+
+    <RadioButton
+      android:id="@+id/rangeWeek"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="12dp"
+      android:text="@string/range_week" />
+
+    <RadioButton
+      android:id="@+id/rangeMonth"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="12dp"
+      android:text="@string/range_month" />
+
+    <RadioButton
+      android:id="@+id/rangeAll"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="12dp"
+      android:text="@string/range_all" />
+
+  </RadioGroup>
+
+  <ListView
+    android:id="@+id/listSessions"
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    android:layout_marginTop="12dp" />
+
+  <TextView
+    android:id="@+id/txtStatus"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="8dp"
+    android:textSize="13sp" />
+
+</LinearLayout>
