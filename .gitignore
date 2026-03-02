@@ -19,6 +19,9 @@ out/
 *.jks
 *.keystore
 
+# Local signing config (NEVER commit)
+keystore.properties
+
 # Mac/Windows
 .DS_Store
 Thumbs.db
