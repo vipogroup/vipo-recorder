@@ -48,3 +48,8 @@ data class SessionSummary(
   val segmentCount: Long,
   val totalDurationMs: Long
 )
+
+data class SegmentFileRow(
+  val sessionId: String,
+  val path: String
+)

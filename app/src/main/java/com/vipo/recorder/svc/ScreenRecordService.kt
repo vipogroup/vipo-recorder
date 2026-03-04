@@ -19,6 +19,7 @@ import com.vipo.recorder.data.SegmentEntity
 import com.vipo.recorder.data.SessionEntity
 import com.vipo.recorder.util.DisplayUtils
 import com.vipo.recorder.util.Ids
+import com.vipo.recorder.util.Prefs
 import kotlinx.coroutines.*
 import java.io.File
 
@@ -66,6 +67,8 @@ class ScreenRecordService : Service() {
   private var lastActiveTs: Long = 0L
   private var lastPackage: String? = null
 
+  private var hasActivitySignal: Boolean = false
+
   private val handler = Handler(Looper.getMainLooper())
   private val overlay by lazy { OverlayController(this) }
   private val ticker = object : Runnable {
@@ -77,7 +80,7 @@ class ScreenRecordService : Service() {
         val idle = now - lastActiveTs > IDLE_TIMEOUT_MS
         val isSegOn = activeSegmentId != null
 
-        if (!grace && idle && isSegOn) {
+        if (hasActivitySignal && !grace && idle && isSegOn) {
           // stop current segment due to idle
           stopSegment(reason = "idle")
         }
@@ -123,6 +126,7 @@ class ScreenRecordService : Service() {
 
       ACTION_ACTIVITY_PING -> {
         // Update activity time and last package; if session active and no segment -> start new segment
+        hasActivitySignal = true
         lastActiveTs = System.currentTimeMillis()
         lastPackage = intent.getStringExtra(EXTRA_LAST_PACKAGE) ?: lastPackage
 
@@ -144,6 +148,7 @@ class ScreenRecordService : Service() {
     activeSessionId = sid
     sessionStartTs = System.currentTimeMillis()
     lastActiveTs = sessionStartTs
+    hasActivitySignal = false
     activeSegmentIdx = 0
 
     scope.launch(io) {
@@ -187,6 +192,7 @@ class ScreenRecordService : Service() {
     overlay.hide()
 
     activeSessionId = null
+    hasActivitySignal = false
   }
 
   private fun startSegment() {
@@ -203,15 +209,25 @@ class ScreenRecordService : Service() {
     activeSegmentPath = outFile.absolutePath
 
     val m = DisplayUtils.metrics(this)
+    val scale = Prefs.getRecordScale(this)
+    val targetW = ((m.w.toFloat() * scale).toInt()).coerceAtLeast(2)
+    val targetH = ((m.h.toFloat() * scale).toInt()).coerceAtLeast(2)
+    val w = if (targetW % 2 == 0) targetW else targetW - 1
+    val h = if (targetH % 2 == 0) targetH else targetH - 1
+    val baseBitrate = 8_000_000
+    val bitrate = (baseBitrate.toDouble() * (scale.toDouble() * scale.toDouble()))
+      .toInt()
+      .coerceAtLeast(1_000_000)
+
     val rec = MediaRecorder().apply {
       setVideoSource(MediaRecorder.VideoSource.SURFACE)
       setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
       setOutputFile(outFile.absolutePath)
 
       setVideoEncoder(MediaRecorder.VideoEncoder.H264)
-      setVideoSize(m.w, m.h)
+      setVideoSize(w, h)
       setVideoFrameRate(30)
-      setVideoEncodingBitRate(8_000_000)
+      setVideoEncodingBitRate(bitrate)
 
       prepare()
     }
@@ -220,7 +236,7 @@ class ScreenRecordService : Service() {
     val surface = rec.surface
     vd = projection.createVirtualDisplay(
       "VIPORecorderDisplay",
-      m.w, m.h, m.densityDpi,
+      w, h, m.densityDpi,
       DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
       surface,
       null,

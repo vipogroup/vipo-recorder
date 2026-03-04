@@ -41,6 +41,13 @@
     android:layout_marginTop="10dp"
     android:text="@string/library" />
 
+  <Button
+    android:id="@+id/btnSettings"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="10dp"
+    android:text="@string/settings" />
+
   <TextView
     android:id="@+id/txtHint"
     android:layout_width="match_parent"

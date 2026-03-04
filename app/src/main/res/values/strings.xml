@@ -5,6 +5,7 @@
   <string name="stop">Stop</string>
   <string name="play_latest">Play latest</string>
   <string name="library">ספרייה</string>
+  <string name="settings">הגדרות</string>
   <string name="filter_by_app">סינון לפי אפליקציה</string>
   <string name="filter_by_time">סינון לפי זמן</string>
   <string name="range_day">יום</string>
@@ -13,4 +14,15 @@
   <string name="range_all">הכל</string>
   <string name="all_apps">כל האפליקציות</string>
   <string name="found_sessions">נמצאו %1$d הקלטות</string>
+  <string name="recording_resolution">רזולוציית הקלטה</string>
+  <string name="resolution_100">גבוהה (100%)</string>
+  <string name="resolution_75">בינונית (75%)</string>
+  <string name="resolution_50">נמוכה (50%)</string>
+  <string name="resolution_note">רזולוציה נמוכה חוסכת מקום בטלפון, אבל מורידה איכות.</string>
+  <string name="update_url">כתובת עדכון (JSON)</string>
+  <string name="update_url_hint">לדוגמה: https://example.com/vipo/update.json</string>
+  <string name="save">שמור</string>
+  <string name="saved">נשמר</string>
+  <string name="update_url_note">אם הכתובת ריקה, בדיקת עדכונים מבוטלת.</string>
+  <string name="back">חזרה</string>
 </resources>

@@ -1,8 +1,10 @@
 package com.vipo.recorder.ui
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.lifecycle.lifecycleScope
 import com.vipo.recorder.R
@@ -11,6 +13,7 @@ import com.vipo.recorder.data.SessionSummary
 import com.vipo.recorder.databinding.ActivityLibraryBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -64,7 +67,41 @@ class LibraryActivity : ComponentActivity() {
       startActivity(i)
     }
 
+    b.listSessions.setOnItemLongClickListener { _, _, position, _ ->
+      val sid = sessionRows.getOrNull(position)?.sessionId ?: return@setOnItemLongClickListener true
+
+      AlertDialog.Builder(this)
+        .setTitle("מחיקת הקלטה")
+        .setMessage("למחוק את ההקלטה הזאת? הפעולה תמחק גם את הקבצים מהטלפון.")
+        .setNegativeButton(android.R.string.cancel, null)
+        .setPositiveButton("מחק") { _, _ ->
+          deleteSessionAndFiles(sid)
+        }
+        .show()
+
+      true
+    }
+
     loadPackages()
+  }
+
+  private fun deleteSessionAndFiles(sessionId: String) {
+    lifecycleScope.launch(Dispatchers.IO) {
+      val dao = RecordingDb.get(this@LibraryActivity).dao()
+      val segs = dao.segmentsForSession(sessionId)
+
+      segs.forEach { s ->
+        runCatching { File(s.path).delete() }
+      }
+
+      dao.deleteSegmentsForSession(sessionId)
+      dao.deleteSession(sessionId)
+
+      launch(Dispatchers.Main) {
+        Toast.makeText(this@LibraryActivity, "נמחק", Toast.LENGTH_SHORT).show()
+        refresh()
+      }
+    }
   }
 
   private fun loadPackages() {
@@ -109,10 +146,19 @@ class LibraryActivity : ComponentActivity() {
       val dao = RecordingDb.get(this@LibraryActivity).dao()
       val summaries: List<SessionSummary> = dao.sessionSummaries(fromTs, now, selectedPackage)
 
+      val segFiles = dao.segmentFilesForSessionSummaries(fromTs, now, selectedPackage)
+      val sizeBySessionId = HashMap<String, Long>()
+      for (row in segFiles) {
+        val f = File(row.path)
+        val len = if (f.exists()) f.length() else 0L
+        sizeBySessionId[row.sessionId] = (sizeBySessionId[row.sessionId] ?: 0L) + len
+      }
+
       val rows = summaries.map { s ->
+        val sizeBytes = sizeBySessionId[s.sessionId] ?: 0L
         SessionRow(
           sessionId = s.sessionId,
-          text = sessionLabel(s)
+          text = sessionLabel(s, sizeBytes)
         )
       }
 
@@ -133,6 +179,26 @@ class LibraryActivity : ComponentActivity() {
     val start = dateFmt.format(Date(s.startTs))
     val dur = formatDuration(s.totalDurationMs)
     return "$start | $dur | ${s.segmentCount} segments"
+  }
+
+  private fun sessionLabel(s: SessionSummary, sizeBytes: Long): String {
+    val start = dateFmt.format(Date(s.startTs))
+    val dur = formatDuration(s.totalDurationMs)
+    val size = formatBytes(sizeBytes)
+    return "$start | $dur | ${s.segmentCount} segments | $size"
+  }
+
+  private fun formatBytes(bytes: Long): String {
+    val b = bytes.coerceAtLeast(0L)
+    val kb = 1024.0
+    val mb = kb * 1024.0
+    val gb = mb * 1024.0
+    return when {
+      b >= gb -> String.format(Locale.getDefault(), "%.2f GB", b / gb)
+      b >= mb -> String.format(Locale.getDefault(), "%.1f MB", b / mb)
+      b >= kb -> String.format(Locale.getDefault(), "%.1f KB", b / kb)
+      else -> "$b B"
+    }
   }
 
   private fun formatDuration(ms: Long): String {

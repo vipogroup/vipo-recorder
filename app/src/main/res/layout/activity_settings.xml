@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:orientation="vertical"
+  android:padding="20dp">
+
+  <TextView
+    android:id="@+id/txtTitle"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="@string/settings"
+    android:textSize="18sp"
+    android:textStyle="bold"
+    android:paddingBottom="12dp" />
+
+  <TextView
+    android:id="@+id/txtResolutionTitle"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="@string/recording_resolution"
+    android:textSize="14sp" />
+
+  <RadioGroup
+    android:id="@+id/radioResolution"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="8dp"
+    android:orientation="vertical">
+
+    <RadioButton
+      android:id="@+id/radioRes100"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/resolution_100" />
+
+    <RadioButton
+      android:id="@+id/radioRes75"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="6dp"
+      android:text="@string/resolution_75" />
+
+    <RadioButton
+      android:id="@+id/radioRes50"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="6dp"
+      android:text="@string/resolution_50" />
+
+  </RadioGroup>
+
+  <TextView
+    android:id="@+id/txtNote"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="14dp"
+    android:text="@string/resolution_note"
+    android:textSize="13sp" />
+
+  <TextView
+    android:id="@+id/txtUpdateUrlTitle"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="18dp"
+    android:text="@string/update_url"
+    android:textSize="14sp" />
+
+  <EditText
+    android:id="@+id/editUpdateUrl"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="8dp"
+    android:hint="@string/update_url_hint"
+    android:inputType="textUri"
+    android:maxLines="1" />
+
+  <TextView
+    android:id="@+id/txtUpdateUrlNote"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="8dp"
+    android:text="@string/update_url_note"
+    android:textSize="13sp" />
+
+  <Button
+    android:id="@+id/btnSaveUpdateUrl"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="12dp"
+    android:text="@string/save" />
+
+  <Button
+    android:id="@+id/btnBack"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="14dp"
+    android:text="@string/back" />
+
+</LinearLayout>

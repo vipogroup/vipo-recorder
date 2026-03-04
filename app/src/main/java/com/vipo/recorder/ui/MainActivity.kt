@@ -15,6 +15,7 @@ import androidx.lifecycle.lifecycleScope
 import com.vipo.recorder.databinding.ActivityMainBinding
 import com.vipo.recorder.data.RecordingDb
 import com.vipo.recorder.svc.ScreenRecordService
+import com.vipo.recorder.util.UpdateManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -40,10 +41,22 @@ class MainActivity : ComponentActivity() {
     b.btnStop.setOnClickListener { stopSession() }
     b.btnPlayLatest.setOnClickListener { playLatest() }
     b.btnLibrary.setOnClickListener { openLibrary() }
+    b.btnSettings.setOnClickListener { openSettings() }
+
+    UpdateManager.checkForUpdate(this)
+  }
+
+  override fun onResume() {
+    super.onResume()
+    UpdateManager.tryInstallPending(this)
   }
 
   private fun openLibrary() {
     startActivity(Intent(this, LibraryActivity::class.java))
+  }
+
+  private fun openSettings() {
+    startActivity(Intent(this, SettingsActivity::class.java))
   }
 
   private fun requestCapturePermission() {

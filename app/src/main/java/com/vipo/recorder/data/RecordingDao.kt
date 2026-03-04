@@ -26,6 +26,33 @@ interface RecordingDao {
   @Query("SELECT * FROM segments WHERE sessionId = :sessionId ORDER BY idx ASC")
   suspend fun segmentsForSession(sessionId: String): List<SegmentEntity>
 
+  @Query("DELETE FROM segments WHERE sessionId = :sessionId")
+  suspend fun deleteSegmentsForSession(sessionId: String)
+
+  @Query("DELETE FROM sessions WHERE sessionId = :sessionId")
+  suspend fun deleteSession(sessionId: String)
+
+  @Query(
+    """
+    SELECT seg.sessionId AS sessionId, seg.path AS path
+    FROM segments seg
+    WHERE seg.sessionId IN (
+      SELECT s.sessionId
+      FROM sessions s
+      WHERE s.startTs BETWEEN :fromTs AND :toTs
+        AND (
+          :packageName IS NULL
+          OR EXISTS (
+            SELECT 1 FROM segments seg2
+            WHERE seg2.sessionId = s.sessionId
+              AND seg2.lastPackage = :packageName
+          )
+        )
+    )
+    """
+  )
+  suspend fun segmentFilesForSessionSummaries(fromTs: Long, toTs: Long, packageName: String?): List<SegmentFileRow>
+
   @Query("SELECT DISTINCT lastPackage FROM segments WHERE lastPackage IS NOT NULL ORDER BY lastPackage ASC")
   suspend fun distinctPackages(): List<String>
 
