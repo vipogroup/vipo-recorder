@@ -25,4 +25,21 @@
   <string name="saved">נשמר</string>
   <string name="update_url_note">אם הכתובת ריקה, בדיקת עדכונים מבוטלת.</string>
   <string name="back">חזרה</string>
+
+  <string name="parental_home_title">מסך הבית (מצב ילד)</string>
+  <string name="parental_home_status">לחץ על אפליקציה כדי לפתוח</string>
+  <string name="parental_parent_button">הורה (PIN)</string>
+
+  <string name="parental_pin_title">כניסת הורה</string>
+  <string name="parental_pin_hint">בפעם הראשונה קובעים PIN. לאחר מכן צריך להזין את ה-PIN כדי לנהל אפליקציות.</string>
+  <string name="parental_pin_input">PIN</string>
+  <string name="parental_pin_confirm">אישור PIN</string>
+  <string name="continue_btn">המשך</string>
+
+  <string name="parental_apps_title">ניהול אפליקציות (Whitelist)</string>
+  <string name="parental_device_owner_unknown">סטטוס Device Owner: לא ידוע</string>
+  <string name="parental_device_owner_yes">סטטוס Device Owner: פעיל</string>
+  <string name="parental_device_owner_no">סטטוס Device Owner: לא פעיל (חובה להפעלה מלאה)</string>
+  <string name="parental_activate_child_mode">הפעל מצב ילד (Kiosk)</string>
+  <string name="parental_deactivate_child_mode">כבה מצב ילד</string>
 </resources>

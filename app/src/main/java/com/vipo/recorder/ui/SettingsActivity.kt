@@ -33,6 +33,22 @@ class SettingsActivity : ComponentActivity() {
       Prefs.setRecordScale(this, newScale)
     }
 
+    val quality = Prefs.getQuality(this)
+    when (quality) {
+      Prefs.QUALITY_LOW -> b.radioQualityLow.isChecked = true
+      Prefs.QUALITY_HIGH -> b.radioQualityHigh.isChecked = true
+      else -> b.radioQualityMedium.isChecked = true
+    }
+
+    b.radioQuality.setOnCheckedChangeListener { _, checkedId ->
+      val q = when (checkedId) {
+        b.radioQualityLow.id -> Prefs.QUALITY_LOW
+        b.radioQualityHigh.id -> Prefs.QUALITY_HIGH
+        else -> Prefs.QUALITY_MEDIUM
+      }
+      Prefs.setQuality(this, q)
+    }
+
     b.editUpdateUrl.setText(Prefs.getUpdateJsonUrl(this))
     b.btnSaveUpdateUrl.setOnClickListener {
       Prefs.setUpdateJsonUrl(this, b.editUpdateUrl.text?.toString().orEmpty())

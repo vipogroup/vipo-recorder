@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:background="@drawable/recorder_bg"
+  android:gravity="center"
+  android:orientation="vertical"
+  android:padding="32dp">
+
+  <TextView
+    android:id="@+id/txtTitle"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:text="@string/parental_pin_title"
+    android:textColor="@android:color/white"
+    android:textSize="24sp"
+    android:textStyle="bold" />
+
+  <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="24dp"
+    android:background="@drawable/card_bg"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <TextView
+      android:id="@+id/txtHint"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:text="@string/parental_pin_hint"
+      android:textColor="#AAAAAA"
+      android:textSize="13sp"
+      android:paddingBottom="10dp" />
+
+    <EditText
+      android:id="@+id/editPin"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:hint="@string/parental_pin_input"
+      android:inputType="numberPassword"
+      android:maxLines="1"
+      android:textColor="@android:color/white"
+      android:textColorHint="#60FFFFFF"
+      android:textSize="18sp"
+      android:gravity="center" />
+
+    <EditText
+      android:id="@+id/editPinConfirm"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="10dp"
+      android:hint="@string/parental_pin_confirm"
+      android:inputType="numberPassword"
+      android:maxLines="1"
+      android:textColor="@android:color/white"
+      android:textColorHint="#60FFFFFF"
+      android:textSize="18sp"
+      android:gravity="center" />
+
+    <Button
+      android:id="@+id/btnContinue"
+      android:layout_width="match_parent"
+      android:layout_height="48dp"
+      android:layout_marginTop="16dp"
+      android:background="@drawable/btn_primary_bg"
+      android:textColor="@android:color/white"
+      android:textSize="16sp"
+      android:textAllCaps="false"
+      android:text="@string/continue_btn" />
+
+    <Button
+      android:id="@+id/btnBack"
+      android:layout_width="match_parent"
+      android:layout_height="44dp"
+      android:layout_marginTop="8dp"
+      android:background="@drawable/btn_secondary_bg"
+      android:textColor="#FFAAAAAA"
+      android:textSize="14sp"
+      android:textAllCaps="false"
+      android:text="@string/back" />
+
+  </LinearLayout>
+
+</LinearLayout>

@@ -64,6 +64,7 @@ android {
 
   buildFeatures {
     viewBinding = true
+    buildConfig = true
   }
 }
 
@@ -86,4 +87,9 @@ dependencies {
 
   // Coroutines
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
+
+  // Media3 Transformer for video compression before sharing
+  implementation("androidx.media3:media3-transformer:1.4.1")
+  implementation("androidx.media3:media3-effect:1.4.1")
+  implementation("androidx.media3:media3-common:1.4.1")
 }

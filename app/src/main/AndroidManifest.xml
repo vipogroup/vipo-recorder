@@ -1,10 +1,19 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+  <queries>
+    <intent>
+      <action android:name="android.intent.action.MAIN" />
+      <category android:name="android.intent.category.LAUNCHER" />
+    </intent>
+  </queries>
+
   <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
   <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
   <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
   <uses-permission android:name="android.permission.INTERNET" />
   <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+  <uses-permission android:name="android.permission.RECORD_AUDIO" />
+  <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 
   <application
     android:name=".App"
@@ -28,6 +37,18 @@
       android:name=".ui.SettingsActivity"
       android:exported="false" />
 
+     <activity
+       android:name=".ui.HomeActivity"
+       android:exported="false" />
+
+     <activity
+       android:name=".ui.ParentPinActivity"
+       android:exported="false" />
+
+     <activity
+       android:name=".ui.ParentAppsActivity"
+       android:exported="false" />
+
     <activity
       android:name=".ui.MainActivity"
       android:exported="true">
@@ -36,6 +57,34 @@
         <category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
     </activity>
+
+     <receiver
+       android:name=".kiosk.VipoDeviceAdminReceiver"
+       android:permission="android.permission.BIND_DEVICE_ADMIN"
+       android:exported="true">
+       <meta-data
+         android:name="android.app.device_admin"
+         android:resource="@xml/device_admin_receiver" />
+       <intent-filter>
+         <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
+       </intent-filter>
+     </receiver>
+
+    <receiver
+      android:name=".kiosk.ClearDeviceOwnerReceiver"
+      android:exported="true">
+      <intent-filter>
+        <action android:name="com.vipo.recorder.CLEAR_DEVICE_OWNER" />
+      </intent-filter>
+    </receiver>
+
+    <receiver
+      android:name=".svc.RecordableReceiver"
+      android:exported="true">
+      <intent-filter>
+        <action android:name="com.vipo.recorder.SET_RECORDABLE_PACKAGES" />
+      </intent-filter>
+    </receiver>
 
     <service
       android:name=".svc.ScreenRecordService"

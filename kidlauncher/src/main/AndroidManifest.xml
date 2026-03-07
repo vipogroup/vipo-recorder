@@ -1,0 +1,76 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+  <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+  <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+  <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+
+  <queries>
+    <intent>
+      <action android:name="android.intent.action.MAIN" />
+      <category android:name="android.intent.category.LAUNCHER" />
+    </intent>
+    <intent>
+      <action android:name="android.intent.action.MAIN" />
+      <category android:name="android.intent.category.HOME" />
+      <category android:name="android.intent.category.DEFAULT" />
+    </intent>
+  </queries>
+
+  <application
+    android:allowBackup="true"
+    android:label="@string/app_name"
+    android:icon="@android:drawable/ic_menu_compass"
+    android:roundIcon="@android:drawable/ic_menu_compass"
+    android:supportsRtl="true"
+    android:theme="@style/Theme.KidLauncher">
+
+    <activity
+      android:name=".ui.KidHomeActivity"
+      android:exported="true">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.HOME" />
+        <category android:name="android.intent.category.DEFAULT" />
+      </intent-filter>
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity>
+
+    <activity
+      android:name=".ui.ParentPinActivity"
+      android:exported="false" />
+
+    <activity
+      android:name=".ui.ParentSettingsActivity"
+      android:exported="false" />
+
+    <activity
+      android:name=".ui.ChangePinActivity"
+      android:exported="false" />
+
+    <activity
+      android:name=".ui.ChooseNormalHomeActivity"
+      android:exported="false" />
+
+    <receiver
+      android:name=".kiosk.KidDeviceAdminReceiver"
+      android:permission="android.permission.BIND_DEVICE_ADMIN"
+      android:exported="true">
+      <meta-data
+        android:name="android.app.device_admin"
+        android:resource="@xml/device_admin_receiver" />
+      <intent-filter>
+        <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
+      </intent-filter>
+    </receiver>
+
+    <service
+      android:name=".svc.KidOverlayService"
+      android:exported="false"
+      android:foregroundServiceType="specialUse" />
+
+  </application>
+</manifest>

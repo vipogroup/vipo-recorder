@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:background="@drawable/kid_bg"
+  android:orientation="vertical"
+  android:padding="16dp">
+
+  <TextView
+    android:id="@+id/txtTitle"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:padding="8dp"
+    android:text="@string/kid_title"
+    android:textColor="@android:color/white"
+    android:textSize="26sp"
+    android:textStyle="bold" />
+
+  <TextView
+    android:id="@+id/txtStatus"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:paddingBottom="8dp"
+    android:textColor="#CCFFFFFF"
+    android:textSize="14sp" />
+
+  <androidx.recyclerview.widget.RecyclerView
+    android:id="@+id/rvApps"
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    android:clipToPadding="false"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp" />
+
+  <!-- Settings access via long press on title (3s) or 5 rapid taps on floating button -->
+
+</LinearLayout>

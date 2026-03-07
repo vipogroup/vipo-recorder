@@ -35,3 +35,7 @@ captures/
 
 # Kotlin
 .kotlin/
+
+# Temp files
+temp_prefs.xml
+tmp_prefs.xml

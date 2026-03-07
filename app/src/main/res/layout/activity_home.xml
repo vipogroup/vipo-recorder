@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:background="@drawable/recorder_bg"
+  android:orientation="vertical"
+  android:padding="16dp">
+
+  <TextView
+    android:id="@+id/txtTitle"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:text="@string/parental_home_title"
+    android:textColor="@android:color/white"
+    android:textSize="22sp"
+    android:textStyle="bold"
+    android:paddingBottom="4dp" />
+
+  <TextView
+    android:id="@+id/txtStatus"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:text="@string/parental_home_status"
+    android:textColor="#80FFFFFF"
+    android:textSize="13sp"
+    android:paddingBottom="10dp" />
+
+  <ListView
+    android:id="@+id/listApps"
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    android:divider="@android:color/transparent"
+    android:dividerHeight="4dp" />
+
+  <Button
+    android:id="@+id/btnParent"
+    android:layout_width="match_parent"
+    android:layout_height="48dp"
+    android:layout_marginTop="8dp"
+    android:background="@drawable/btn_primary_bg"
+    android:textColor="@android:color/white"
+    android:textSize="15sp"
+    android:textAllCaps="false"
+    android:text="@string/parental_parent_button" />
+
+</LinearLayout>

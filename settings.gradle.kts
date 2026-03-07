@@ -10,7 +10,10 @@ dependencyResolutionManagement {
   repositories {
     google()
     mavenCentral()
+    @Suppress("JcenterRepositoryObsolete")
+    jcenter()
   }
 }
 rootProject.name = "VIPORecorder"
 include(":app")
+include(":kidlauncher")

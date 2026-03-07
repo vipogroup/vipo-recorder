@@ -2,58 +2,93 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
+  android:background="@drawable/recorder_bg"
   android:orientation="vertical"
-  android:padding="20dp"
+  android:padding="24dp"
   android:gravity="center_horizontal">
+
+  <TextView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:text="VIPO Recorder"
+    android:textColor="@android:color/white"
+    android:textSize="24sp"
+    android:textStyle="bold"
+    android:paddingBottom="8dp" />
 
   <TextView
     android:id="@+id/txtStatus"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:gravity="center"
     android:text="Status: idle"
-    android:textSize="16sp"
-    android:paddingBottom="16dp"/>
+    android:textColor="#80FFFFFF"
+    android:textSize="14sp"
+    android:paddingBottom="20dp"/>
 
   <Button
     android:id="@+id/btnStart"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="52dp"
+    android:background="@drawable/btn_start_bg"
+    android:textColor="@android:color/white"
+    android:textSize="16sp"
+    android:textAllCaps="false"
     android:text="@string/start" />
 
   <Button
     android:id="@+id/btnStop"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="48dp"
     android:layout_marginTop="10dp"
+    android:background="@drawable/btn_record_bg"
+    android:textColor="@android:color/white"
+    android:textSize="15sp"
+    android:textAllCaps="false"
     android:text="@string/stop" />
 
   <Button
     android:id="@+id/btnPlayLatest"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="48dp"
     android:layout_marginTop="10dp"
+    android:background="@drawable/btn_primary_bg"
+    android:textColor="@android:color/white"
+    android:textSize="15sp"
+    android:textAllCaps="false"
     android:text="@string/play_latest" />
 
   <Button
     android:id="@+id/btnLibrary"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="48dp"
     android:layout_marginTop="10dp"
+    android:background="@drawable/btn_primary_bg"
+    android:textColor="@android:color/white"
+    android:textSize="15sp"
+    android:textAllCaps="false"
     android:text="@string/library" />
 
   <Button
     android:id="@+id/btnSettings"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="48dp"
     android:layout_marginTop="10dp"
+    android:background="@drawable/btn_secondary_bg"
+    android:textColor="#FFAAAAAA"
+    android:textSize="15sp"
+    android:textAllCaps="false"
     android:text="@string/settings" />
 
   <TextView
     android:id="@+id/txtHint"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="18dp"
+    android:layout_marginTop="20dp"
     android:text="כדי שההקלטה תיעצר כשאין שימוש, חייב להפעיל Settings > Accessibility > VIPORecorder Idle Service."
-    android:textSize="13sp" />
+    android:textColor="#60FFFFFF"
+    android:textSize="12sp"
+    android:gravity="center" />
 
 </LinearLayout>

@@ -1,8 +1,14 @@
 package com.vipo.recorder.svc
 
+import android.Manifest
 import android.app.*
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.media.AudioAttributes
+import android.media.AudioFormat
+import android.media.AudioPlaybackCaptureConfiguration
+import android.media.AudioRecord
 import android.media.MediaRecorder
 import android.media.projection.MediaProjection
 import android.media.projection.MediaProjectionManager
@@ -47,6 +53,10 @@ class ScreenRecordService : Service() {
     private const val IDLE_TIMEOUT_MS = 30_000L // 30s
     private const val TICK_MS = 1000L
     private const val GRACE_AFTER_START_MS = 7_000L
+
+    @Volatile
+    var isRecording: Boolean = false
+      private set
   }
 
   private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
@@ -125,13 +135,28 @@ class ScreenRecordService : Service() {
       }
 
       ACTION_ACTIVITY_PING -> {
-        // Update activity time and last package; if session active and no segment -> start new segment
         hasActivitySignal = true
         lastActiveTs = System.currentTimeMillis()
-        lastPackage = intent.getStringExtra(EXTRA_LAST_PACKAGE) ?: lastPackage
+        val newPkg = intent.getStringExtra(EXTRA_LAST_PACKAGE)
 
-        if (activeSessionId != null && activeSegmentId == null) {
-          startSegment()
+        if (activeSessionId != null && newPkg != null && newPkg != lastPackage) {
+          // App changed — stop current segment and start a new one for the new app
+          if (activeSegmentId != null) {
+            stopSegment(reason = "app_switch")
+          }
+          lastPackage = newPkg
+
+          if (Prefs.isPackageRecordable(this, newPkg)) {
+            startSegment()
+          }
+        } else {
+          if (newPkg != null) lastPackage = newPkg
+
+          if (activeSessionId != null && activeSegmentId == null) {
+            if (Prefs.isPackageRecordable(this, lastPackage)) {
+              startSegment()
+            }
+          }
         }
       }
     }
@@ -146,6 +171,7 @@ class ScreenRecordService : Service() {
 
     val sid = Ids.sessionId()
     activeSessionId = sid
+    isRecording = true
     sessionStartTs = System.currentTimeMillis()
     lastActiveTs = sessionStartTs
     hasActivitySignal = false
@@ -192,6 +218,7 @@ class ScreenRecordService : Service() {
     overlay.hide()
 
     activeSessionId = null
+    isRecording = false
     hasActivitySignal = false
   }
 
@@ -209,24 +236,50 @@ class ScreenRecordService : Service() {
     activeSegmentPath = outFile.absolutePath
 
     val m = DisplayUtils.metrics(this)
-    val scale = Prefs.getRecordScale(this)
+    val quality = Prefs.getQuality(this)
+    val scale = when (quality) {
+      Prefs.QUALITY_LOW -> 0.5f
+      Prefs.QUALITY_MEDIUM -> 0.75f
+      else -> Prefs.getRecordScale(this)
+    }
+    val fps = when (quality) {
+      Prefs.QUALITY_LOW -> 15
+      Prefs.QUALITY_MEDIUM -> 20
+      else -> 30
+    }
+    val baseBitrate = when (quality) {
+      Prefs.QUALITY_LOW -> 1_500_000
+      Prefs.QUALITY_MEDIUM -> 3_000_000
+      else -> 8_000_000
+    }
+
     val targetW = ((m.w.toFloat() * scale).toInt()).coerceAtLeast(2)
     val targetH = ((m.h.toFloat() * scale).toInt()).coerceAtLeast(2)
     val w = if (targetW % 2 == 0) targetW else targetW - 1
     val h = if (targetH % 2 == 0) targetH else targetH - 1
-    val baseBitrate = 8_000_000
     val bitrate = (baseBitrate.toDouble() * (scale.toDouble() * scale.toDouble()))
       .toInt()
-      .coerceAtLeast(1_000_000)
+      .coerceAtLeast(500_000)
+
+    val hasMicPerm = checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
 
     val rec = MediaRecorder().apply {
+      if (hasMicPerm) {
+        setAudioSource(MediaRecorder.AudioSource.MIC)
+      }
       setVideoSource(MediaRecorder.VideoSource.SURFACE)
       setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
       setOutputFile(outFile.absolutePath)
 
+      if (hasMicPerm) {
+        setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
+        setAudioEncodingBitRate(128_000)
+        setAudioSamplingRate(44100)
+        setAudioChannels(1)
+      }
       setVideoEncoder(MediaRecorder.VideoEncoder.H264)
       setVideoSize(w, h)
-      setVideoFrameRate(30)
+      setVideoFrameRate(fps)
       setVideoEncodingBitRate(bitrate)
 
       prepare()

@@ -1,0 +1,29 @@
+<resources>
+  <string name="app_name">KidLauncher</string>
+  <string name="kid_title">DriveOS</string>
+  <string name="kid_settings">הגדרות</string>
+  <string name="kid_exit">חזרה</string>
+  <string name="kid_record">הקלטה</string>
+
+  <string name="pin_title">כניסת הורה</string>
+  <string name="pin_hint">הזן PIN</string>
+  <string name="action_continue">המשך</string>
+  <string name="back">חזרה</string>
+
+  <string name="parent_settings_title">הגדרות הורה</string>
+  <string name="saved">נשמר</string>
+  <string name="activate_kid_mode">הפעל מצב ילד</string>
+  <string name="deactivate_kid_mode">יציאה למצב רגיל</string>
+  <string name="change_pin">שינוי PIN</string>
+  <string name="device_owner_yes">Device Owner: כן</string>
+  <string name="device_owner_no">Device Owner: לא</string>
+  <string name="choose_normal_home">בחר מסך בית רגיל</string>
+  <string name="normal_home_title">מסך בית רגיל</string>
+
+  <string name="change_pin_title">שינוי PIN</string>
+  <string name="current_pin_hint">PIN נוכחי</string>
+  <string name="new_pin_hint">PIN חדש</string>
+  <string name="confirm_pin_hint">אימות PIN</string>
+  <string name="save">שמור</string>
+  <string name="kid_screen_name_hint">שם מסך הילד (ברירת מחדל: DriveOS)</string>
+</resources>

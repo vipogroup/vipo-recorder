@@ -37,21 +37,29 @@ interface RecordingDao {
     SELECT seg.sessionId AS sessionId, seg.path AS path
     FROM segments seg
     WHERE seg.sessionId IN (
+      SELECT s.sessionId FROM sessions s WHERE s.startTs BETWEEN :fromTs AND :toTs
+    )
+    """
+  )
+  suspend fun segmentFilesAll(fromTs: Long, toTs: Long): List<SegmentFileRow>
+
+  @Query(
+    """
+    SELECT seg.sessionId AS sessionId, seg.path AS path
+    FROM segments seg
+    WHERE seg.sessionId IN (
       SELECT s.sessionId
       FROM sessions s
       WHERE s.startTs BETWEEN :fromTs AND :toTs
-        AND (
-          :packageName IS NULL
-          OR EXISTS (
-            SELECT 1 FROM segments seg2
-            WHERE seg2.sessionId = s.sessionId
-              AND seg2.lastPackage = :packageName
-          )
+        AND EXISTS (
+          SELECT 1 FROM segments seg2
+          WHERE seg2.sessionId = s.sessionId
+            AND seg2.lastPackage = :packageName
         )
     )
     """
   )
-  suspend fun segmentFilesForSessionSummaries(fromTs: Long, toTs: Long, packageName: String?): List<SegmentFileRow>
+  suspend fun segmentFilesFiltered(fromTs: Long, toTs: Long, packageName: String): List<SegmentFileRow>
 
   @Query("SELECT DISTINCT lastPackage FROM segments WHERE lastPackage IS NOT NULL ORDER BY lastPackage ASC")
   suspend fun distinctPackages(): List<String>
@@ -67,17 +75,31 @@ interface RecordingDao {
     FROM sessions s
     LEFT JOIN segments seg ON seg.sessionId = s.sessionId
     WHERE s.startTs BETWEEN :fromTs AND :toTs
-      AND (
-        :packageName IS NULL
-        OR EXISTS (
-          SELECT 1 FROM segments seg2
-          WHERE seg2.sessionId = s.sessionId
-            AND seg2.lastPackage = :packageName
-        )
+    GROUP BY s.sessionId
+    ORDER BY s.startTs DESC
+    """
+  )
+  suspend fun sessionSummariesAll(fromTs: Long, toTs: Long): List<SessionSummary>
+
+  @Query(
+    """
+    SELECT
+      s.sessionId AS sessionId,
+      s.startTs AS startTs,
+      s.endTs AS endTs,
+      COUNT(seg.segmentId) AS segmentCount,
+      COALESCE(SUM(COALESCE(seg.durationMs, 0)), 0) AS totalDurationMs
+    FROM sessions s
+    LEFT JOIN segments seg ON seg.sessionId = s.sessionId
+    WHERE s.startTs BETWEEN :fromTs AND :toTs
+      AND EXISTS (
+        SELECT 1 FROM segments seg2
+        WHERE seg2.sessionId = s.sessionId
+          AND seg2.lastPackage = :packageName
       )
     GROUP BY s.sessionId
     ORDER BY s.startTs DESC
     """
   )
-  suspend fun sessionSummaries(fromTs: Long, toTs: Long, packageName: String?): List<SessionSummary>
+  suspend fun sessionSummariesFiltered(fromTs: Long, toTs: Long, packageName: String): List<SessionSummary>
 }

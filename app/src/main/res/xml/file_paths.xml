@@ -3,4 +3,10 @@
   <external-files-path
     name="external_files"
     path="Download/" />
+  <files-path
+    name="records"
+    path="records/" />
+  <files-path
+    name="compressed"
+    path="compressed/" />
 </paths>

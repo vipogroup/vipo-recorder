@@ -1,16 +1,20 @@
 package com.vipo.recorder.ui
 
 import android.app.AlertDialog
+import android.app.ProgressDialog
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
 import com.vipo.recorder.R
 import com.vipo.recorder.data.RecordingDb
 import com.vipo.recorder.data.SessionSummary
 import com.vipo.recorder.databinding.ActivityLibraryBinding
+import com.vipo.recorder.util.VideoCompressor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
@@ -70,12 +74,23 @@ class LibraryActivity : ComponentActivity() {
     b.listSessions.setOnItemLongClickListener { _, _, position, _ ->
       val sid = sessionRows.getOrNull(position)?.sessionId ?: return@setOnItemLongClickListener true
 
+      val options = arrayOf("שתף לוואצאפ / מייל", "מחק הקלטה")
       AlertDialog.Builder(this)
-        .setTitle("מחיקת הקלטה")
-        .setMessage("למחוק את ההקלטה הזאת? הפעולה תמחק גם את הקבצים מהטלפון.")
-        .setNegativeButton(android.R.string.cancel, null)
-        .setPositiveButton("מחק") { _, _ ->
-          deleteSessionAndFiles(sid)
+        .setTitle("פעולות")
+        .setItems(options) { _, which ->
+          when (which) {
+            0 -> shareSession(sid)
+            1 -> {
+              AlertDialog.Builder(this)
+                .setTitle("מחיקת הקלטה")
+                .setMessage("למחוק את ההקלטה הזאת? הפעולה תמחק גם את הקבצים מהטלפון.")
+                .setNegativeButton(android.R.string.cancel, null)
+                .setPositiveButton("מחק") { _, _ ->
+                  deleteSessionAndFiles(sid)
+                }
+                .show()
+            }
+          }
         }
         .show()
 
@@ -119,9 +134,9 @@ class LibraryActivity : ComponentActivity() {
         packageOptions = options
         val adapter = ArrayAdapter(
           this@LibraryActivity,
-          android.R.layout.simple_spinner_item,
+          R.layout.item_spinner,
           packageOptions
-        ).also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
+        ).also { it.setDropDownViewResource(R.layout.item_spinner_dropdown) }
 
         b.spnPackage.adapter = adapter
         b.spnPackage.setSelection(0)
@@ -144,9 +159,17 @@ class LibraryActivity : ComponentActivity() {
 
     lifecycleScope.launch(Dispatchers.IO) {
       val dao = RecordingDb.get(this@LibraryActivity).dao()
-      val summaries: List<SessionSummary> = dao.sessionSummaries(fromTs, now, selectedPackage)
+      val summaries: List<SessionSummary> = if (selectedPackage == null) {
+        dao.sessionSummariesAll(fromTs, now)
+      } else {
+        dao.sessionSummariesFiltered(fromTs, now, selectedPackage)
+      }
 
-      val segFiles = dao.segmentFilesForSessionSummaries(fromTs, now, selectedPackage)
+      val segFiles = if (selectedPackage == null) {
+        dao.segmentFilesAll(fromTs, now)
+      } else {
+        dao.segmentFilesFiltered(fromTs, now, selectedPackage)
+      }
       val sizeBySessionId = HashMap<String, Long>()
       for (row in segFiles) {
         val f = File(row.path)
@@ -166,7 +189,7 @@ class LibraryActivity : ComponentActivity() {
         sessionRows = rows
         val adapter = ArrayAdapter(
           this@LibraryActivity,
-          android.R.layout.simple_list_item_1,
+          R.layout.item_session,
           sessionRows.map { it.text }
         )
         b.listSessions.adapter = adapter
@@ -211,6 +234,104 @@ class LibraryActivity : ComponentActivity() {
     } else {
       String.format(Locale.getDefault(), "%d:%02d", m, s)
     }
+  }
+
+  private fun shareSession(sessionId: String) {
+    lifecycleScope.launch(Dispatchers.IO) {
+      val dao = RecordingDb.get(this@LibraryActivity).dao()
+      val segs = dao.segmentsForSession(sessionId)
+
+      val files = segs.map { File(it.path) }.filter { it.exists() && it.length() > 0 }
+
+      if (files.isEmpty()) {
+        launch(Dispatchers.Main) {
+          Toast.makeText(this@LibraryActivity, "אין קבצי הקלטה לשיתוף", Toast.LENGTH_SHORT).show()
+        }
+        return@launch
+      }
+
+      val totalMB = files.sumOf { it.length() } / (1024.0 * 1024.0)
+
+      launch(Dispatchers.Main) {
+        if (totalMB > 15) {
+          AlertDialog.Builder(this@LibraryActivity)
+            .setTitle("הקובץ גדול (${String.format("%.0f", totalMB)}MB)")
+            .setMessage("רוצה לדחוס לפני שליחה?\nדחיסה תקטין את הגודל בכ-90%.")
+            .setPositiveButton("דחוס ושתף") { _, _ ->
+              compressAndShare(files)
+            }
+            .setNegativeButton("שתף כמו שזה") { _, _ ->
+              shareFiles(files)
+            }
+            .setNeutralButton("ביטול", null)
+            .show()
+        } else {
+          shareFiles(files)
+        }
+      }
+    }
+  }
+
+  private fun compressAndShare(files: List<File>) {
+    @Suppress("DEPRECATION")
+    val progress = ProgressDialog(this).apply {
+      setMessage("דוחס הקלטה... אנא המתן")
+      setCancelable(false)
+      isIndeterminate = true
+      show()
+    }
+
+    lifecycleScope.launch(Dispatchers.IO) {
+      val compressDir = File(filesDir, "compressed")
+      compressDir.mkdirs()
+
+      val compressedFiles = mutableListOf<File>()
+      var allSuccess = true
+
+      for (f in files) {
+        val result = VideoCompressor.compress(this@LibraryActivity, f, compressDir)
+        if (result.success && result.outputFile != null) {
+          compressedFiles.add(result.outputFile)
+        } else {
+          allSuccess = false
+          compressedFiles.add(f) // fallback to original
+        }
+      }
+
+      launch(Dispatchers.Main) {
+        progress.dismiss()
+        if (!allSuccess) {
+          Toast.makeText(this@LibraryActivity, "חלק מהקבצים לא נדחסו — נשלחים כמו שהם", Toast.LENGTH_SHORT).show()
+        }
+        val totalMB = compressedFiles.sumOf { it.length() } / (1024.0 * 1024.0)
+        Toast.makeText(this@LibraryActivity, "גודל אחרי דחיסה: ${String.format("%.1f", totalMB)}MB", Toast.LENGTH_SHORT).show()
+        shareFiles(compressedFiles)
+      }
+    }
+  }
+
+  private fun shareFiles(files: List<File>) {
+    val uris = ArrayList<Uri>()
+    for (f in files) {
+      val uri = FileProvider.getUriForFile(this, "${packageName}.fileprovider", f)
+      uris.add(uri)
+    }
+
+    val shareIntent = if (uris.size == 1) {
+      Intent(Intent.ACTION_SEND).apply {
+        type = "video/mp4"
+        putExtra(Intent.EXTRA_STREAM, uris[0])
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+      }
+    } else {
+      Intent(Intent.ACTION_SEND_MULTIPLE).apply {
+        type = "video/mp4"
+        putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris)
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+      }
+    }
+
+    startActivity(Intent.createChooser(shareIntent, "שתף הקלטה"))
   }
 
   private fun appLabel(pkg: String): String {
